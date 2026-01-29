@@ -609,13 +609,60 @@ typedef struct _EFI_GRAPHICS_OUTPUT_PROTOCOL {
 } EFI_GRAPHICS_OUTPUT_PROTOCOL;
 
 /* ============================================================================
- * Global Variables (defined in main.c)
+ * Configuration Table
+ * ============================================================================ */
+
+typedef struct {
+    EFI_GUID        VendorGuid;
+    VOID            *VendorTable;
+} EFI_CONFIGURATION_TABLE;
+
+/* ACPI Table GUIDs */
+#define EFI_ACPI_20_TABLE_GUID \
+    { 0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81 } }
+
+#define EFI_ACPI_10_TABLE_GUID \
+    { 0xeb9d2d30, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d } }
+
+/* SMBIOS Table GUIDs */
+#define SMBIOS_TABLE_GUID \
+    { 0xeb9d2d31, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d } }
+
+#define SMBIOS3_TABLE_GUID \
+    { 0xf2fd1544, 0x9794, 0x4a2c, { 0x99, 0x2e, 0xe5, 0xbb, 0xcf, 0x20, 0xe3, 0x94 } }
+
+/* ============================================================================
+ * Updated System Table (with Configuration Table pointer typed)
+ * ============================================================================ */
+
+/* Note: EFI_SYSTEM_TABLE is defined above with ConfigurationTable as VOID*
+ * Access it cast to EFI_CONFIGURATION_TABLE* when iterating */
+
+/* ============================================================================
+ * Global Variables (defined in loader.c)
  * ============================================================================ */
 
 extern EFI_HANDLE           gImageHandle;
 extern EFI_SYSTEM_TABLE     *gST;
 extern EFI_BOOT_SERVICES    *gBS;
 extern EFI_RUNTIME_SERVICES *gRS;
+
+/* ============================================================================
+ * GUID Comparison Helper
+ * ============================================================================ */
+
+/**
+ * Compare two GUIDs for equality
+ */
+static inline BOOLEAN guid_equal(const EFI_GUID *a, const EFI_GUID *b) {
+    if (a->Data1 != b->Data1) return FALSE;
+    if (a->Data2 != b->Data2) return FALSE;
+    if (a->Data3 != b->Data3) return FALSE;
+    for (int i = 0; i < 8; i++) {
+        if (a->Data4[i] != b->Data4[i]) return FALSE;
+    }
+    return TRUE;
+}
 
 /* ============================================================================
  * Utility Macros

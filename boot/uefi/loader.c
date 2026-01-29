@@ -1,11 +1,28 @@
 /**
- * AAAos UEFI Bootloader - Kernel Loading Functions
+ * AAAos UEFI Bootloader - Main Entry Point and Kernel Loading
  *
- * This file implements kernel loading, memory map retrieval,
- * framebuffer setup, and boot services exit.
+ * This file implements the complete UEFI bootloader including:
+ * - UEFI environment initialization
+ * - Memory map retrieval and conversion to E820 format
+ * - Graphics Output Protocol (GOP) framebuffer setup
+ * - ELF64 kernel loading
+ * - ACPI RSDP discovery
+ * - Boot services exit and kernel handoff
+ *
+ * Compiled as a PE32+ executable for UEFI systems.
+ * Kernel path: /EFI/BOOT/kernel.elf
  */
 
 #include "uefi.h"
+
+/* ============================================================================
+ * Global UEFI Variables
+ * ============================================================================ */
+
+EFI_HANDLE           gImageHandle = NULL;
+EFI_SYSTEM_TABLE     *gST = NULL;
+EFI_BOOT_SERVICES    *gBS = NULL;
+EFI_RUNTIME_SERVICES *gRS = NULL;
 
 /* ============================================================================
  * Boot Info Structures (must match kernel's boot.h)
